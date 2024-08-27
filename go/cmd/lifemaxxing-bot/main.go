@@ -5,8 +5,8 @@ import (
 
 	"github.com/joho/godotenv"
 
-	"coinbase-scalper/pkg/operations"
-	"coinbase-scalper/pkg/utils"
+	"coinbase-scalper/internal/operations"
+	"coinbase-scalper/internal/utils"
 	"sync"
 )
 

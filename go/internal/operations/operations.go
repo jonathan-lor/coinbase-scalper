@@ -7,9 +7,9 @@ import (
 	"os"
 	"strconv"
 
-	"coinbase-scalper/pkg/jwtgenerator"
-	types "coinbase-scalper/pkg/types"
-	"coinbase-scalper/pkg/utils"
+	"coinbase-scalper/internal/jwtgenerator"
+	types "coinbase-scalper/internal/types"
+	"coinbase-scalper/internal/utils"
 )
 
 func GetAssetDetails(name string) (price float64, baseName string, quoteName string, ppc24h string) {
