@@ -8,12 +8,11 @@ import (
 	"strconv"
 
 	"coinbase-scalper/internal/jwtgenerator"
-	"coinbase-scalper/internal/models"
+	types "coinbase-scalper/internal/types"
 	"coinbase-scalper/internal/utils"
 )
 
-
-func GetAssetDetails(name string) (price float64, baseName string, quoteName string, ppc24h string){
+func GetAssetDetails(name string) (price float64, baseName string, quoteName string, ppc24h string) {
 	keyName := os.Getenv("KEY_NAME")
 	keySecret := os.Getenv("KEY_SECRET")
 	uri := fmt.Sprintf("%s %s%s%s", "GET", "api.coinbase.com", "/api/v3/brokerage/products/", name)
@@ -26,17 +25,17 @@ func GetAssetDetails(name string) (price float64, baseName string, quoteName str
 	}
 
 	req, err := http.NewRequest(method, url, nil)
-	
+
 	if err != nil {
 		utils.LogAndPrintError("Error creating request: %v", err)
 	}
-	req.Header.Set("Authorization", "Bearer " + jwt)
+	req.Header.Set("Authorization", "Bearer "+jwt)
 	req.Header.Add("Content-Type", "application/json")
 
 	client := &http.Client{}
 
 	res, err := client.Do(req)
-	if err!= nil {
+	if err != nil {
 		utils.LogAndPrintError("Error in the response: %v", err)
 	}
 
@@ -44,7 +43,7 @@ func GetAssetDetails(name string) (price float64, baseName string, quoteName str
 		utils.LogAndPrintError("Unexpected status code: %d", err)
 	}
 
-	var product models.Product
+	var product types.Product
 	err = json.NewDecoder(res.Body).Decode(&product)
 	if err != nil {
 		utils.LogAndPrintError("Error parsing response to model: %v", err)
@@ -68,15 +67,15 @@ func SimulateBuy(
 	balance *float64,
 	btcHolding *float64,
 	entryPrice *float64,
-	position *string,
-	) {
-		tradeAmount := *balance * 0.5
-		btcAmount := tradeAmount / price
-		*balance -= tradeAmount
-		*btcHolding += btcAmount
-		*entryPrice = price
-		*position = "long"
-		fmt.Printf("Simulated buy: %.8f BTC at $%.2f\n", btcAmount, price)
+	position *bool,
+) {
+	tradeAmount := *balance * 0.5
+	btcAmount := tradeAmount / price
+	*balance -= tradeAmount
+	*btcHolding += btcAmount
+	*entryPrice = price
+	*position = true
+	fmt.Printf("Simulated buy: %.8f BTC at $%.2f\n", btcAmount, price)
 }
 
 func SimulateSell(
@@ -84,12 +83,12 @@ func SimulateSell(
 	balance *float64,
 	btcHolding *float64,
 	entryPrice *float64,
-	position *string,
-	) {
-		soldAmount := *btcHolding * price
-		*balance += soldAmount
-		*btcHolding = 0
-		*position = ""
-		profit := soldAmount - (*entryPrice * *btcHolding)
-		fmt.Printf("Simulated sell: %.8f BTC %.2f, Profit: %.2f\n", *btcHolding, price, profit)
+	position *bool,
+) {
+	soldAmount := *btcHolding * price
+	*balance += soldAmount
+	*position = false
+	profit := soldAmount - (*entryPrice * *btcHolding)
+	fmt.Printf("Simulated sell: %.8f BTC %.2f, Profit: %.2f\n", *btcHolding, price, profit)
+	*btcHolding = 0
 }
