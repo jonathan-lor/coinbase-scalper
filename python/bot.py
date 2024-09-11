@@ -78,7 +78,7 @@ class Bot:
                 self.last_price = current_price;
             except Exception as e:
                 print(f"An error occurred: {e}")
-                sys.Exit(1)
+                sys.exit(1)
 
 
 
